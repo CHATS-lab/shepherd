@@ -18,8 +18,8 @@
   if (!anim) return;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const SEQ = ["create", "observe", "intercept", "recover"];
-  const DELAY = { create: 250, observe: 1050, intercept: 1950, recover: 2900 };
+  const SEQ = ["create", "observe", "intercept", "revert", "fork"];
+  const DELAY = { create: 250, observe: 1050, intercept: 1900, revert: 2750, fork: 3550 };
   let timers = [];
 
   function reset() {
@@ -38,7 +38,7 @@
     reset();
     if (reduce) { SEQ.forEach(reveal); return; }
     SEQ.forEach((s) => timers.push(setTimeout(() => reveal(s), DELAY[s])));
-    timers.push(setTimeout(run, DELAY.recover + 2800)); // hold, then replay periodically
+    timers.push(setTimeout(run, DELAY.fork + 2800)); // hold, then replay periodically
   }
 
   const btn = anim.querySelector(".anim__replay");

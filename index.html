@@ -29,8 +29,10 @@
 
   <!-- ===== Hero ===== -->
   <header class="hero">
-    <img class="hero__logo" src="assets/logo-shepherd.png" alt="SHEPHERD" />
-    <h1 class="hero__title">SHEPHERD: Programmable Meta-Agents via Reversible Agentic Execution Traces</h1>
+    <div class="hero__head">
+      <img class="hero__logo" src="assets/logo-shepherd.png" alt="SHEPHERD" />
+      <h1 class="hero__title">SHEPHERD: Programmable Meta-Agents via Reversible Agentic Execution Traces</h1>
+    </div>
     <p class="hero__tag">Your harness is just another agent.</p>
     <p class="authors">
       <a href="https://simonucl.github.io/" target="_blank" rel="noopener">Simon Yu</a><sup>*1</sup>,
@@ -152,10 +154,14 @@
             <text x="582" y="195" fill="#d2402a" font-weight="700">&#10007; fail</text>
           </g>
 
-          <!-- recover: revert + fork -->
-          <g class="g-step" data-step="recover">
-            <path d="M430 172 C 430 136, 360 136, 352 173" fill="none" stroke="#0f8a81" stroke-width="2.5" marker-end="url(#arrT)"/>
-            <text x="391" y="130" text-anchor="middle" fill="#0a655e" font-weight="700">Revert</text>
+          <!-- revert: arrow on top, pointing down at the buggy edit -->
+          <g class="g-step" data-step="revert">
+            <path d="M486 150 C 478 122, 446 122, 433 174" fill="none" stroke="#0f8a81" stroke-width="2.5" marker-end="url(#arrT)"/>
+            <text x="458" y="114" text-anchor="middle" fill="#0a655e" font-weight="700">Revert</text>
+          </g>
+
+          <!-- fork: patched branch that passes -->
+          <g class="g-step" data-step="fork">
             <path d="M350 203 C 350 250, 398 268, 430 274" fill="none" stroke="#7857c8" stroke-width="3"/>
             <text x="372" y="252" text-anchor="middle" fill="#0a655e" font-weight="700">Fork</text>
             <circle cx="430" cy="278" r="13" fill="#7857c8"/>
@@ -179,7 +185,7 @@
 <span class="kw">@agent</span>(LLM=<span class="st">"opus"</span>, tool=[observe, revert, fork])
 <span class="kw">def</span> <span class="fn">oversee</span>(agent_run):
     <span class="st">"If tests break, revert the agent and retry"</span></pre>
-        <pre class="cblock cblock--manage" data-step="recover"><span class="cm"># meta-agent manages the agent</span>
+        <pre class="cblock cblock--manage" data-step="fork"><span class="cm"># meta-agent manages the agent</span>
 agent_run = <span class="fn">implement</span>(repo, <span class="st">"login"</span>)
 implemented = <span class="fn">oversee</span>(agent_run)</pre>
       </div>
