@@ -134,11 +134,8 @@
             <text x="270" y="220" text-anchor="middle" fill="#5a3fa3" font-weight="700">LLM-call</text>
           </g>
 
-          <!-- intercept -->
-          <g class="g-step" data-step="intercept">
-            <circle cx="430" cy="58" r="9" fill="#fff" stroke="#0f8a81" stroke-width="2.5"/>
-            <text x="430" y="40" text-anchor="middle" fill="#0a655e" font-weight="700">Intercept</text>
-            <line x1="430" y1="98" x2="430" y2="172" stroke="#0f8a81" stroke-width="2.5" marker-end="url(#arrT)"/>
+          <!-- buggy: the worker reaches a buggy edit and fails -->
+          <g class="g-step" data-step="buggy">
             <line x1="283" y1="190" x2="430" y2="190" stroke="#7857c8" stroke-width="3"/>
             <circle cx="350" cy="190" r="13" fill="#7857c8"/>
             <text x="350" y="220" text-anchor="middle" fill="#5a3fa3" font-weight="700">tool-call</text>
@@ -149,6 +146,13 @@
             <circle cx="532" cy="190" r="12" fill="#ded9e7" stroke="#bdb8c9" stroke-width="2"/>
             <line x1="546" y1="190" x2="572" y2="190" stroke="#bdb8c9" stroke-width="2.5" marker-end="url(#arrG)"/>
             <text x="582" y="195" fill="#d2402a" font-weight="700">&#10007; fail</text>
+          </g>
+
+          <!-- intercept: the meta-agent intervenes on the buggy edit -->
+          <g class="g-step" data-step="intercept">
+            <circle cx="430" cy="58" r="9" fill="#fff" stroke="#0f8a81" stroke-width="2.5"/>
+            <text x="430" y="40" text-anchor="middle" fill="#0a655e" font-weight="700">Intercept</text>
+            <line x1="430" y1="98" x2="430" y2="172" stroke="#0f8a81" stroke-width="2.5" marker-end="url(#arrT)"/>
           </g>
 
           <!-- revert: arc back toward the pre-edit state -->

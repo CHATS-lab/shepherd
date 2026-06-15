@@ -18,8 +18,8 @@
   if (!anim) return;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const SEQ = ["create", "observe", "intercept", "revert", "fork"];
-  const DELAY = { create: 250, observe: 1050, intercept: 1900, revert: 2750, fork: 3550 };
+  const SEQ = ["create", "observe", "buggy", "intercept", "revert", "fork"];
+  const DELAY = { create: 250, observe: 1100, buggy: 1950, intercept: 2800, revert: 3650, fork: 4500 };
   let timers = [];
 
   function reset() {
