@@ -63,16 +63,16 @@ p  { margin: 0 0 16px; }
 
 /* ---------- hero ---------- */
 .hero { text-align: center; padding: 26px 0 18px; border-bottom: 1px solid var(--line); }
-.hero__logo { width: 76px; height: 76px; margin-bottom: 14px; }
-.hero__title { font-size: clamp(1.5rem, 3.6vw, 2.1rem); font-weight: 700; line-height: 1.2; letter-spacing: -.02em; margin: 0 auto 10px; max-width: 18em; }
-.hero__tag { font-size: 1.15rem; color: var(--accent); font-weight: 600; margin: 0 0 18px; }
-.authors { font-size: 1.02rem; margin: 0 auto 4px; max-width: 40em; }
-.affil { font-size: .9rem; color: var(--muted); margin: 0 0 18px; }
+.hero__logo { width: 104px; height: 104px; margin-bottom: 16px; }
+.hero__title { font-size: clamp(2.2rem, 5.2vw, 3.4rem); font-weight: 700; line-height: 1.12; letter-spacing: -.02em; margin: 0 auto 14px; max-width: 20em; }
+.hero__tag { font-size: clamp(1.35rem, 2.4vw, 1.7rem); color: var(--accent); font-weight: 600; margin: 0 0 22px; }
+.authors { font-size: 1.3rem; line-height: 1.5; margin: 0 auto 6px; max-width: 46em; }
+.affil { font-size: 1.1rem; color: var(--muted); margin: 0 0 20px; }
 
 .links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 0; }
 .lnk {
-  display: inline-block; font-size: .95rem; font-weight: 600;
-  padding: 7px 18px; border-radius: 999px;
+  display: inline-block; font-size: 1.12rem; font-weight: 600;
+  padding: 10px 26px; border-radius: 999px;
   background: var(--text); color: #fff;
 }
 .lnk:hover { background: #000; color: #fff; text-decoration: none; }
@@ -80,11 +80,11 @@ p  { margin: 0 0 16px; }
 
 /* affiliation logos */
 .orgs { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 30px; margin: 6px 0 20px; }
-.orgs img { height: 40px; width: auto; opacity: .88; }
-.orgs img[alt="Stanford NLP Group"] { height: 84px; }
+.orgs img { height: 54px; width: auto; opacity: .88; }
+.orgs img[alt="Stanford NLP Group"] { height: 104px; }
 .orgs a { display: inline-flex; }
 .orgs a:hover img { opacity: 1; }
-@media (max-width: 480px) { .orgs { gap: 18px; } .orgs img { height: 32px; } .orgs img[alt="Stanford NLP Group"] { height: 64px; } }
+@media (max-width: 480px) { .orgs { gap: 18px; } .orgs img { height: 42px; } .orgs img[alt="Stanford NLP Group"] { height: 80px; } }
 
 /* ---------- figures ---------- */
 figure { margin: 22px 0; }
