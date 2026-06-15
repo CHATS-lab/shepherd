@@ -29,10 +29,7 @@
 
   <!-- ===== Hero ===== -->
   <header class="hero">
-    <div class="hero__head">
-      <img class="hero__logo" src="assets/logo-shepherd.png" alt="SHEPHERD" />
-      <h1 class="hero__title">SHEPHERD: Programmable Meta-Agents via Reversible Agentic Execution Traces</h1>
-    </div>
+    <h1 class="hero__title">SHEPHERD: Programmable Meta-Agents via Reversible Agentic Execution Traces</h1>
     <p class="hero__tag">Your harness is just another agent.</p>
     <p class="authors">
       <a href="https://simonucl.github.io/" target="_blank" rel="noopener">Simon Yu</a><sup>*1</sup>,
@@ -122,7 +119,7 @@
           <g class="g-step" data-step="create">
             <circle cx="160" cy="58" r="9" fill="#fff" stroke="#0f8a81" stroke-width="2.5"/>
             <text x="160" y="40" text-anchor="middle" fill="#0a655e" font-weight="700">Create</text>
-            <line x1="160" y1="98" x2="160" y2="150" stroke="#0f8a81" stroke-width="2.5" marker-end="url(#arrT)"/>
+            <line x1="160" y1="98" x2="160" y2="172" stroke="#0f8a81" stroke-width="2.5" marker-end="url(#arrT)"/>
             <circle cx="160" cy="190" r="13" fill="#7857c8"/>
             <text x="160" y="220" text-anchor="middle" fill="#5a3fa3" font-weight="700">Agent</text>
           </g>
@@ -131,7 +128,7 @@
           <g class="g-step" data-step="observe">
             <circle cx="270" cy="58" r="9" fill="#fff" stroke="#0f8a81" stroke-width="2.5"/>
             <text x="270" y="40" text-anchor="middle" fill="#0a655e" font-weight="700">Observe</text>
-            <line x1="270" y1="98" x2="270" y2="150" stroke="#0f8a81" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrT)"/>
+            <line x1="270" y1="98" x2="270" y2="172" stroke="#0f8a81" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrT)"/>
             <line x1="173" y1="190" x2="270" y2="190" stroke="#7857c8" stroke-width="3"/>
             <circle cx="270" cy="190" r="13" fill="#7857c8"/>
             <text x="270" y="220" text-anchor="middle" fill="#5a3fa3" font-weight="700">LLM-call</text>
@@ -139,14 +136,14 @@
 
           <!-- intercept -->
           <g class="g-step" data-step="intercept">
-            <circle cx="390" cy="58" r="9" fill="#fff" stroke="#0f8a81" stroke-width="2.5"/>
-            <text x="390" y="40" text-anchor="middle" fill="#0a655e" font-weight="700">Intercept</text>
-            <line x1="390" y1="98" x2="390" y2="150" stroke="#0f8a81" stroke-width="2.5" marker-end="url(#arrT)"/>
+            <circle cx="430" cy="58" r="9" fill="#fff" stroke="#0f8a81" stroke-width="2.5"/>
+            <text x="430" y="40" text-anchor="middle" fill="#0a655e" font-weight="700">Intercept</text>
+            <line x1="430" y1="98" x2="430" y2="172" stroke="#0f8a81" stroke-width="2.5" marker-end="url(#arrT)"/>
             <line x1="283" y1="190" x2="430" y2="190" stroke="#7857c8" stroke-width="3"/>
             <circle cx="350" cy="190" r="13" fill="#7857c8"/>
             <text x="350" y="220" text-anchor="middle" fill="#5a3fa3" font-weight="700">tool-call</text>
             <circle cx="430" cy="190" r="13" fill="#7857c8"/>
-            <circle cx="430" cy="171" r="5" fill="#d2402a"/>
+            <circle cx="441" cy="182" r="5" fill="#d2402a"/>
             <text x="430" y="220" text-anchor="middle" fill="#5a3fa3" font-weight="700">edit (buggy)</text>
             <line x1="443" y1="190" x2="520" y2="190" stroke="#bdb8c9" stroke-width="2.5" stroke-dasharray="4 4"/>
             <circle cx="532" cy="190" r="12" fill="#ded9e7" stroke="#bdb8c9" stroke-width="2"/>
@@ -154,10 +151,10 @@
             <text x="582" y="195" fill="#d2402a" font-weight="700">&#10007; fail</text>
           </g>
 
-          <!-- revert: arrow on top, pointing down at the buggy edit -->
+          <!-- revert: arc back toward the pre-edit state -->
           <g class="g-step" data-step="revert">
-            <path d="M486 150 C 478 122, 446 122, 433 174" fill="none" stroke="#0f8a81" stroke-width="2.5" marker-end="url(#arrT)"/>
-            <text x="458" y="114" text-anchor="middle" fill="#0a655e" font-weight="700">Revert</text>
+            <path d="M418 174 C 408 140, 368 140, 354 174" fill="none" stroke="#0f8a81" stroke-width="2.5" marker-end="url(#arrT)"/>
+            <text x="386" y="128" text-anchor="middle" fill="#0a655e" font-weight="700">Revert</text>
           </g>
 
           <!-- fork: patched branch that passes -->
