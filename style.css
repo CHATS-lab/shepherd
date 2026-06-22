@@ -246,3 +246,36 @@ details p { margin-top: 10px; font-size: .95rem; color: var(--muted); }
 .terminal__body .p { color: #28c840; font-weight: 600; }
 .terminal__body .c { color: #7a8694; }
 .terminal__body .s { color: #e3b341; }
+
+/* ============================================================
+   Responsive / mobile
+   ============================================================ */
+/* Grid and flex children default to min-width:auto, so a wide <pre>/<svg>
+   inside them refuses to shrink and forces horizontal scroll. Let them shrink. */
+.anim__diagram, .anim__code { min-width: 0; }
+.try > * { min-width: 0; }
+.terminal, .try__code { min-width: 0; }
+img, svg, video, pre, table { max-width: 100%; }
+
+@media (max-width: 600px) {
+  .wrap { padding: 8px 16px 64px; }
+  .nav { padding: 12px 16px; }
+  .nav__links { gap: 14px; }
+  .hero { padding: 18px 0 14px; }
+  .hero__title { font-size: clamp(1.4rem, 6.2vw, 1.9rem); max-width: 100%; }
+  .hero__tag { font-size: 1.06rem; }
+  .authors { font-size: .98rem; max-width: 100%; }
+  .affil { font-size: .86rem; }
+  .orgs { gap: 16px; margin-bottom: 18px; }
+  .orgs img { height: 38px; }
+  .orgs img[alt="Stanford NLP Group"] { height: 70px; }
+  .links { gap: 8px; }
+  .lnk { font-size: 1rem; padding: 9px 20px; }
+  .teaser { margin: 22px 0; }
+  figcaption { font-size: .82rem; }
+  h2 { font-size: 1.3rem; }
+  .abstract h2 { font-size: 1.55rem; }
+  .abstract__body p { font-size: 1rem; line-height: 1.7; }
+  .try-h { font-size: 1.4rem; }
+  .anim { gap: 14px; }
+}

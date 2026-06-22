@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SHEPHERD — Programmable Meta-Agents via Reversible Execution Traces</title>
+<title>SHEPHERD: Programmable Meta-Agents via Reversible Execution Traces</title>
 <meta name="description" content="SHEPHERD makes an agent's execution a first-class, reversible, Git-like trace, so the harness that supervises your agents can be just another agent." />
 <link rel="icon" type="image/png" href="assets/logo-shepherd.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -93,7 +93,7 @@
     <h2>The idea: execution becomes data</h2>
     <p>
       A meta-agent <b>creates</b> a worker, <b>observes</b> its execution without perturbing it, and
-      <b>intercepts</b> a bad action before it lands &mdash; then forks a patched branch and reverts the
+      <b>intercepts</b> a bad action before it lands, then forks a patched branch and reverts the
       buggy one. Because the whole run is a reversible, Git-like trace, all of this is ordinary
       <code>@agent</code> code.
     </p>
@@ -242,7 +242,7 @@ implemented = <span class="fn">oversee</span>(agent_run)</pre>
 <span class="c"># add the Claude Code (or Codex) plugin</span>
 <span class="p">$</span> shepherd plugin install claude-code
 
-<span class="c"># run it — every step is a commit</span>
+<span class="c"># run it: every step is a commit</span>
 <span class="p">$</span> shepherd run claude <span class="s">"fix the login bug"</span>
 
 <span class="c"># went wrong? roll back like git</span>
