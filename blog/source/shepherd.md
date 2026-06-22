@@ -22,36 +22,29 @@ links:
 ---
 
 > [!tldr]
-> - **Problem.** A meta-agent (a higher-order agent that watches, steers, or repairs other agents) has to reconstruct everything by hand: parse transcripts, rebuild snapshots, write one-off tooling to step in before a bad write lands. The runtime hands it fragments, not the whole run.
-> - **Idea.** SHEPHERD records every agent-environment interaction as a typed event in a Git-like execution trace where any past state can be forked and replayed cheaply. A meta-agent is then a plain `@agent` whose argument is another agent's run. Deep Research already put an agent *in* the harness; SHEPHERD makes the harness *out of* agents.
-> - **Headline.** A live supervisor recovers **91% of the coordination gap** on CooperBench (pair pass rate 28.8% to 54.7%, the 54.7% from an Opus 4.7 meta-agent over Haiku 4.5 workers). Read it as a proof of existence, not a like-for-like compute win.
-> - **More.** A counterfactual optimizer beats GEPA and MetaHarness on **4 of 5** benchmarks at less wall-clock on every dataset. Meta-agent-guided Tree-GRPO adds **+5.2 points** over flat GRPO on Qwen3.5-35B-A3B and **+3.4** on Nemotron-3-Super-120B-A12B.
-> - **Cost.** Forking an agent with its filesystem is fast and image-size-independent (134 to 143 ms), about **5x cheaper** than `docker commit`. The core correctness argument is mechanized in Lean.
+> A meta-agent watches, steers, or repairs other agents. Today it has to rebuild everything by hand: read the transcripts, snapshot the environment, write one-off code to catch a bad write before it lands. The runtime gives it fragments, never the whole run.
+>
+> SHEPHERD records every agent-environment interaction as a typed event in a Git-like trace, where any past state can be forked and replayed cheaply. That turns a meta-agent into a plain `@agent` that takes another agent's run as its argument. Deep Research put an agent inside the harness. SHEPHERD makes the harness out of agents.
+>
+> We build three meta-agents on it. A live supervisor closes 91% of the coordination gap on CooperBench, lifting pair pass rate from 28.8% to 54.7%. A counterfactual optimizer beats GEPA and MetaHarness on 4 of 5 benchmarks, and does it in less wall-clock every time. Meta-agent-guided Tree-GRPO adds 5.2 points over flat GRPO on Qwen3.5-35B-A3B (and 3.4 on the larger Nemotron-3-Super-120B-A12B). Underneath, a fork that carries its whole filesystem costs 134 to 143 ms, about 5x cheaper than `docker commit`, and the core correctness argument is checked in Lean.
 
 ![**Figure 1.** SHEPHERD makes an agent's whole execution a Git-like, reversible trace. A meta-agent observes, intercepts, forks, and reverts a worker (top left); the same `@agent` code expresses it (right); and three meta-agents built on the substrate improve runtime supervision, counterfactual optimization, and tree-RL (bottom).](../assets/fig-teaser.png)
 
-## Results at a glance
-
-| Use case | Benchmark | Result |
-|---|---|---|
-| Runtime supervision | CooperBench, pair pass rate | 28.8% to 54.7%, closing **91%** of the coordination gap |
-| Counterfactual replay (CRO) | vs GEPA & MetaHarness, 5 benchmarks | **best on 4 of 5** at lower wall-clock; LiveCodeBench 51.0 vs 48.7 / 40.0 / 30.7 |
-| Meta-agent Tree-GRPO | TerminalBench 2.0 transfer (avg@5) | **+5.2** (Qwen3.5-35B-A3B), **+3.4** (Nemotron-3-120B) over flat GRPO |
-| Systems | fork agent + filesystem | 134 to 143 ms, ~**5x** faster than `docker commit`, ~95% KV-cache reuse |
-
 ## Motivation
 
-What watches the harness? Today, nothing. Your harness can pause, intercept, fork, and roll back your agents, but it's exempt from its own rules, even though it makes your most expensive calls: what to retry, which attempt to keep, when to give up. The exemption exists because agent execution was never *data*. A run is scattered across transcripts and environment snapshots while the harness sits outside as privileged host code, so you can read the logs after the fact but you can't hold the run and branch it.
+What watches the harness? Right now, nothing. Your harness can pause an agent, fork it, and roll it back, but it answers to no one, even though it makes your most expensive calls: what to retry, which attempt to keep, when to give up.
 
-Today's runtimes hand you fragments. OpenHands gives you a session's event stream, AgentGit hands the worker Git-like commit tools to checkpoint itself, BranchFS isolates the filesystem. All real and useful, all built for the *running* agent rather than a meta-agent acting *on* it. None lets you branch another agent's whole execution, model state and environment and history together, as one object. So every meta-agent reinvents the plumbing, and the actual work, deciding when to step in, ends up frozen in orchestration code.
+The reason is simple. Agent execution was never data. A run lives scattered across transcripts and environment snapshots, and the harness sits outside it as privileged host code. You can read the logs afterward. You can't pick the run up and branch it.
+
+So today's runtimes hand you pieces. OpenHands gives you a session's event stream. AgentGit hands the worker Git-like commit tools so it can checkpoint itself. BranchFS isolates the filesystem. All of them are useful, and all of them are built for the agent that is running rather than a second agent acting on it. None lets you take another agent's whole execution, its model state and environment and history at once, and branch it as one object. So every meta-agent rebuilds the same plumbing, and the real work, deciding when to step in, gets frozen into orchestration code.
 
 ## The idea: agents all the way up
 
-Once code became data, we got compilers, version control, CI. SHEPHERD does the same for agent execution. Every action an agent takes (a model call, a tool call, a file write) becomes a typed, content-addressed commit in a Git-like trace, recorded before it runs. A run becomes forkable and replayable like a Git branch, and once it's data the harness needs no privileged seat: it's just another agent reading and editing that data.
+When code became data, we got compilers, version control, and CI. SHEPHERD does the same thing for agent execution. Every action an agent takes, a model call, a tool call, a file write, becomes a typed commit in a Git-like trace, written down before it runs. The run turns into something you can fork and replay, like a Git branch. And once the run is data, the harness loses its special seat. It is just another agent reading and editing that data.
 
-Functional programming has long treated an effectful computation as a value you can hold and rewrite. SHEPHERD does that for agents, through four constructs. **What an agent is** is a *task*: a typed function over execution, written with an `@agent` decorator. **What it does** are *effects*: typed records where the intent (the tool call about to be made) is a separate event from the outcome, so a meta-agent can step in between. **Where it runs** is a *scope*: an isolated environment that forks its agent and filesystem together in one copy-on-write step. **What already happened** is the *execution trace*: a Git-like commit graph where any past state is reachable by hash.
+There are four pieces. A *task* is the agent itself, a typed function over execution, written with an `@agent` decorator. An *effect* is something the agent does, recorded as a typed event, with the intent (the tool call it is about to make) kept separate from the outcome, so a meta-agent can slip in between the two. A *scope* is where it runs, an isolated environment that forks the agent and its filesystem together in one copy-on-write step. The *execution trace* is what already happened, a commit graph where any past state is reachable by its hash.
 
-The trace really is Git, not a metaphor: `scope.fork()` is `git checkout -b`, `scope.merge()` is `git merge`, `scope.discard()` is `git branch -D`. And the part that does the work: a meta-agent is just a task whose argument is another task. No privileged loop, no special base class:
+The trace really is Git, not a metaphor. `scope.fork()` is `git checkout -b`, `scope.merge()` is `git merge`, `scope.discard()` is `git branch -D`. And the part that does the real work: a meta-agent is just a task whose argument is another task. No privileged loop, no special base class.
 
 ```python
 from shepherd import agent, observe, revert, fork
@@ -68,18 +61,18 @@ run         = implement(repo, "login")
 implemented = oversee(run)   # the meta-agent manages the agent
 ```
 
-`oversee` subscribes to the effect stream to watch without perturbing, pushes effects in to intercept, checks out an earlier commit to rewind, forks a scope to try an alternative. And since it's just an agent, a third agent can supervise the supervisor by taking `oversee`'s run as *its* input.^[One honest detail: not every effect can be undone. A filesystem write is reversible, a service write is compensable through a handler you supply, and a model call, payment, or email is irreversible (recorded for audit, not un-sendable).]
+`oversee` watches the effect stream without disturbing it, pushes effects in to intervene, checks out an earlier commit to rewind, and forks a scope to try something else. Because it is an agent like any other, a third agent can supervise the supervisor by taking `oversee`'s run as its own input.^[One honest detail: not every effect can be undone. A filesystem write is reversible. A service write is compensable, through a handler you supply. A model call, a payment, an email: those are irreversible, recorded for audit but never un-sendable.]
 
 <details>
 <summary>The formal footing</summary>
 
-The constructs map onto familiar building blocks: task = typed function, effect = algebraic effect, scope = region-scoped handler, trace = persistent data structure. The properties that matter (non-perturbing observation, an atomic fork of agent and environment together, byte-identical revert and replay) rest on a small algebraic-effects trace machine we mechanized in Lean: forward simulation for the core fragment, trace monotonicity, and a single-child branch-replay skeleton. We mechanized the core correctness argument, not the production Python runtime, and the paper marks where the verified boundary stops.
+Each construct maps onto a familiar building block: task = typed function, effect = algebraic effect, scope = region-scoped handler, trace = persistent data structure. The properties we care about (observing without perturbing, an atomic fork of agent and environment together, byte-identical revert and replay) rest on a small algebraic-effects trace machine we mechanized in Lean: forward simulation for the core fragment, trace monotonicity, and a single-child branch-replay skeleton. We mechanized the core correctness argument, not the production Python runtime, and the paper marks exactly where the verified boundary stops.
 
 </details>
 
 ## System performance: Shepherd forking is nearly free
 
-None of the meta-agents below are practical unless a fork costs almost nothing, on every supervision step and every RL rollout. SHEPHERD adds a copy-on-write layer instead of duplicating the filesystem, so a fork is fast and image-size-independent:
+None of the meta-agents below work unless a fork is almost free, because they fork on every supervision step and every RL rollout. SHEPHERD adds a copy-on-write layer instead of copying the filesystem, so a fork stays fast no matter how large the image gets:
 
 | Method | Fork, 42 MB | Fork, 200 MB | Fork, 5.8 GB | Storage / fork |
 |---|---|---|---|---|
@@ -88,28 +81,28 @@ None of the meta-agents below are practical unless a fork costs almost nothing, 
 | BranchFS | 266 ms | 272 ms | 280 ms | ~12 KB |
 | **SHEPHERD** | **134 ms** | **135 ms** | **143 ms** | **~10 KB** |
 
-*Fork latency by image size; revert is similar (SHEPHERD reverts in 140 to 147 ms). SHEPHERD is image-size-independent: roughly 5x faster than `docker commit`, and up to 192x faster than a full copy on the 5.8 GB image, at about 2 to 3% of one agent turn. And because a fork keeps the byte-identical prefix, replaying a branch reuses the provider's KV cache, with the hit rate plateauing around 95% from K=2 on.*
+*Fork latency by image size; revert is similar, 140 to 147 ms. The cost barely moves as the image grows: about 5x faster than `docker commit`, and up to 192x faster than a full copy on the 5.8 GB image, which is 2 to 3% of a single agent turn. A fork also keeps the byte-identical prefix, so replaying a branch reuses the provider's KV cache, with the hit rate settling around 95% from K=2 on.*
 
 ## Results
 
-Three meta-agents over one substrate, at three points in an agent's life: while it runs, after it finishes, while you train it.
+Three meta-agents, one substrate, at three moments in an agent's life: while it runs, after it finishes, and while you train it.
 
-### Usecase 1: Runtime Supervision *(Multi-agent coordination for free)*
+### Runtime supervision: multi-agent coordination for free
 
-CooperBench documents an uncomfortable fact: two coding agents working in parallel on related features do *worse* than one doing both alone, since neither sees what the other is about to do. So we put a supervisor over the pair. Two Claude Haiku 4.5 workers run in forked scopes, one feature each, and a meta-agent (Claude Sonnet 4.6 or Opus 4.7) subscribes to both effect streams with three tools: `inject` guidance, `handoff` one worker's scope as the other's start, or `discard` a stuck worker. Over 479 pairs, the coop baseline (parallel workers, peer-to-peer messages, no supervisor) lands at 28.8%, well under the 57.2% solo ceiling. A Sonnet supervisor reaches 45.3%, an Opus supervisor 54.7%. By the gap arithmetic (54.7 - 28.8) / (57.2 - 28.8), that recovers 91% of the gap, at 1 to 5 minutes of overhead per pair.^[A proof of existence that the substrate enables live supervision, not a like-for-like compute win.]
+CooperBench documents an uncomfortable fact: two coding agents working in parallel on related features do *worse* than one agent doing both alone, because neither sees what the other is about to do. So we put a supervisor over the pair. Two Claude Haiku 4.5 workers run in forked scopes, one feature each, and a meta-agent (Claude Sonnet 4.6 or Opus 4.7) watches both effect streams with three tools: `inject` guidance, `handoff` one worker's scope as the other's starting point, or `discard` a worker that is stuck. Over 479 pairs, the coop baseline (parallel workers, peer-to-peer messages, no supervisor) lands at 28.8%, well below the 57.2% solo ceiling. A Sonnet supervisor reaches 45.3%; an Opus supervisor 54.7%. By the gap arithmetic, (54.7 - 28.8) / (57.2 - 28.8), that closes 91% of the gap, at 1 to 5 minutes of overhead per pair.^[A proof of existence that the substrate enables live supervision, not a like-for-like compute win.]
 
-![CooperBench. Left y-axis: pair pass rate (%), bars at coop 28.8, Sonnet 45.3, Opus 54.7, solo 57.2. Right y-axis: wall-clock in minutes per pair, with the meta-agent's overhead hatched. Figure from the paper.](../assets/fig-supervision.png)
+![Pair pass rate on CooperBench (left axis): coop 28.8, Sonnet 45.3, Opus 54.7, against the 57.2 solo ceiling. The right axis is wall-clock minutes per pair, with the meta-agent's overhead hatched.](../assets/fig-supervision.png)
 
-Counting pairs where each tool is used at least once, the Opus meta-agent injects on 39.2%, hands off on 31.5%, discards rarely on 4.6%. The weaker Sonnet supervisor intervenes less (26.4% inject, 18.7% handoff) but pulls the kill switch more often (7.9% discard).
+Which tools does it reach for? Counting pairs where each is used at least once, the Opus meta-agent injects on 39.2%, hands off on 31.5%, and discards rarely, on 4.6%. The weaker Sonnet supervisor steps in less often (26.4% inject, 18.7% handoff) but pulls the kill switch more (7.9% discard).
 
-![Strategy mix on CooperBench. x-axis: the three tools (inject, handoff, discard). y-axis: share of pairs where each supervisor used the tool at least once. Figure from the paper.](../assets/fig-strategies.png)
+![How often each supervisor reaches for each tool (inject, handoff, discard), as a share of the pairs where it fired at least once.](../assets/fig-strategies.png)
 
 > [!insight]
 > Two parallel agents that sabotage each other are a known failure. A supervisor that can watch both streams and step in, written as a plain agent, recovers almost all of the gap.
 
-### Usecase 2: Meta-Optimization (Counterfactual Replay Optimization)
+### Meta-optimization: counterfactual replay (CRO)
 
-When a workflow fails, the fault is usually a few bad calls. But re-running a patched version from scratch drags in fresh randomness, so you can't tell whether your edit helped or the dice just rolled differently. CRO forks the finished trace at the first commit your edit would touch and replays only that suffix against a fixed baseline. With executor GPT-5.4-mini and optimizers GPT-5.4, CRO is best on 4 of 5 benchmarks against GEPA and MetaHarness, with the highest held-out score *and* the lowest wall-clock on those four.
+When a workflow fails, the fault is usually a few bad calls. Re-run a patched version from scratch and you pull in fresh randomness, so you can't tell whether your edit helped or the dice just landed differently. CRO forks the finished trace at the first commit your edit touches and replays only the suffix, against a fixed baseline. With GPT-5.4-mini as the executor and GPT-5.4 as the optimizer, CRO wins on 4 of 5 benchmarks against GEPA and MetaHarness, with both the highest held-out score and the lowest wall-clock on all four.
 
 | Method | HoVer | MATH | IFBench | LiveCodeBench | TB-2 (avg@5) |
 |---|---|---|---|---|---|
@@ -118,20 +111,20 @@ When a workflow fails, the fault is usually a few bad calls. But re-running a pa
 | MetaHarness | 77.8±0.4 (235) | 79.3±1.2 (101) | **52.3±1.4** (126) | 40.0±3.6 (217) | 31.2 (173) |
 | **CRO** | **79.4±0.2** (120) | **80.0±2.0** (42) | 51.3±1.1 (82) | **51.0±1.7** (117) | **35.2** (73) |
 
-*Test pass-rate mean ± std; optimization minutes in parentheses; bold = best per row. CRO's wall-clock lead over MetaHarness reaches ~58% on MATH (42 vs 101 min). On execution-heavy TB-2, GEPA and MetaHarness both fail to beat the 31.2 baseline while CRO reaches 35.2 (+4 points) at the least wall-clock. The one near-tie is IFBench: MetaHarness edges CRO inside a std (52.3 vs 51.3) while CRO uses less wall-clock, 82 vs 126 minutes.*
+*Test pass-rate mean ± std; optimization minutes in parentheses; bold = best per row. CRO's wall-clock lead over MetaHarness reaches ~58% on MATH (42 vs 101 min). On execution-heavy TB-2, neither GEPA nor MetaHarness beats the 31.2 baseline, while CRO reaches 35.2 (+4 points) at the least wall-clock. The one near-tie is IFBench: MetaHarness edges CRO inside a std (52.3 vs 51.3), and CRO still does it in less time, 82 vs 126 minutes.*
 
-![CRO on LiveCodeBench. x-axis: optimization wall-clock (minutes). y-axis: held-out test pass rate. CRO reaches 51.0 against GEPA 48.7, MetaHarness 40.0, and a 30.7 baseline, at lower wall-clock. Figure from the paper.](../assets/fig-cro.png)
+![CRO on LiveCodeBench: held-out pass rate against optimization wall-clock. CRO reaches 51.0, past GEPA at 48.7, MetaHarness at 40.0, and the 30.7 baseline, in less time.](../assets/fig-cro.png)
 
 > [!insight]
 > Because a fork keeps the byte-identical prefix, CRO judges every edit against a fixed baseline instead of a noisy from-scratch re-run. That is both cheaper and more honest than re-optimizing from zero.
 
-### Usecase 3: MCTS in Terminal RL (Meta-agent-guided Tree-GRPO)
+### Terminal RL: meta-agent-guided Tree-GRPO
 
-RL on long-horizon agent tasks is starved for signal: the reward is one bit at the very end, so flat GRPO learns slowly which turn mattered. During a rollout, a meta-agent picks a turn worth probing and forks K=4 sibling branches from that exact state; the spread across siblings gives per-step counterfactual advantage from the same outcome reward, no separate value model. Flat and Tree-GRPO run on matched generation compute: the same generation budget and rollout steps, so forking buys no extra compute. Training is on Endless Terminals.
+RL on long-horizon agent tasks is starved for signal. The reward is one bit, at the very end, so flat GRPO is slow to figure out which turn actually mattered. During a rollout, a meta-agent picks a turn worth probing and forks K=4 sibling branches from that exact state. The spread across siblings gives a per-step counterfactual advantage from the same final reward, with no separate value model. Flat and Tree-GRPO run on matched generation compute, the same generation budget and the same rollout steps, so forking buys no extra compute. We train on Endless Terminals.
 
-![Tree-GRPO versus flat GRPO on both models. x-axis: training steps. y-axis: mean TRAIN reward. Tree-GRPO climbs above flat GRPO during optimization. Figure from the paper.](../assets/fig-treegrpo.png)
+![Mean training reward over steps, for both models. Tree-GRPO pulls ahead of flat GRPO as training goes on.](../assets/fig-treegrpo.png)
 
-The headline is out-of-distribution transfer to TerminalBench 2.0 (avg@5, 89 tasks, 5 seeds), a suite never seen in training:
+The number that matters is out-of-distribution transfer to TerminalBench 2.0 (avg@5, 89 tasks, 5 seeds), a suite never seen in training:
 
 | Model | Base | Flat GRPO | Tree-GRPO |
 |---|---|---|---|
@@ -141,48 +134,48 @@ The headline is out-of-distribution transfer to TerminalBench 2.0 (avg@5, 89 tas
 *Out-of-distribution transfer to TerminalBench 2.0, avg@5 (%); +gain is vs flat GRPO. The Qwen3.5 +5.2 clears its ~3.9 to 4.1 std comfortably.*^[The Nemotron +3.4 only just edges past its ~3.2 to 3.4 std, a slim margin rather than a clean separation.]
 
 > [!insight]
-> Same generation budget, same recipe, same task set. The only change is forking sibling branches mid-rollout to read off per-step advantage, and it's worth a few points on a hard OOD benchmark.
+> Same generation budget, same recipe, same task set. The only change is forking sibling branches mid-rollout to read off per-step advantage, and it is worth a few points on a hard OOD benchmark.
 
-### Usecase 4: Cost Optimization (Trajectory Compression)
+### Cost: trajectory compression
 
-In the appendix: replay a passing run and ask whether a strictly shorter passing run exists. On SWE-Bench Verified, 68% of Claude Sonnet 4.6 and 82% of GPT-5.4 passing baselines admit one; on TerminalBench v2.0, 77% and 68%. Mean Sonnet length on SWE-Bench Verified falls from 21.4 to 8.9 model calls.
+This one lives in the appendix. Replay a passing run, then ask whether a strictly shorter passing run exists. On SWE-Bench Verified, 68% of Claude Sonnet 4.6 and 82% of GPT-5.4 passing baselines admit one; on TerminalBench v2.0, it is 77% and 68%. Mean Sonnet length on SWE-Bench Verified drops from 21.4 to 8.9 model calls.
 
-![Trajectory compression. Compression rate: share of passing baselines admitting a strictly shorter passing rerun. Mean length: model calls before and after, by model and benchmark. Figure from the paper.](../assets/fig-trajprune.png)
+![Trajectory compression. Left: the share of passing baselines that admit a strictly shorter passing rerun. Right: mean model calls before and after, by model and benchmark.](../assets/fig-trajprune.png)
 
 ## FAQ
 
 <details>
 <summary>Isn't this just AutoGen orchestrating agents?</summary>
 
-AutoGen's manager is an LLM in a privileged host loop; its control actions aren't effects, and you can't supervise it without editing the framework. The difference is uniformity, not existence.
+AutoGen's manager is an LLM in a privileged host loop. Its control actions aren't effects, and you can't supervise it without editing the framework. The difference is uniformity, not existence.
 
 </details>
 
 <details>
 <summary>Doesn't LangGraph already have checkpointing and time-travel?</summary>
 
-Those are engine features, not capabilities an agent inside the system can express. A checkpoint is engine state, not a content-addressed identity stable across runs.
+Those are engine features, not capabilities an agent inside the system can express. A checkpoint is engine state, not a content-addressed identity that stays stable across runs.
 
 </details>
 
 <details>
 <summary>ADAS has a meta-agent. Isn't that the same?</summary>
 
-ADAS writes agents at design time; SHEPHERD's meta-agent supervises execution at run time.
+ADAS writes agents at design time. SHEPHERD's meta-agent supervises execution at run time.
 
 </details>
 
 <details>
 <summary>Isn't this just algebraic effects?</summary>
 
-Yes, on purpose. The contribution is durable handler semantics: content-addressed traces, authority records, and branch-and-replay that outlive the process.
+Yes, on purpose. What's new is durable handler semantics: content-addressed traces, authority records, and branch-and-replay that outlive the process.
 
 </details>
 
 <details>
 <summary>Isn't your kernel privileged too?</summary>
 
-The right objection. But the kernel is mechanism, not policy: it intercepts, persists, enforces permissions, and makes no agentic decisions. Every decision (retry, approve, spend) lives in some agent.
+The right objection. But the kernel is mechanism, not policy: it intercepts, persists, and enforces permissions, and it makes no agentic decisions. Every decision (retry, approve, spend) lives in some agent.
 
 </details>
 
@@ -195,9 +188,9 @@ Can you put a supervisor over your orchestrator by *writing an agent*, instead o
 
 ## Limitations and honest scope
 
-The supervision result is a proof of existence, not a sweep. The meta-agent (Sonnet 4.6 / Opus 4.7) is a stronger, costlier model than the Haiku 4.5 workers, so we don't characterize when it pays for itself; for short tasks the supervisor's tokens can exceed a worker's, and that trade-off is open.
+The supervision result is a proof of existence, not a sweep. The meta-agent (Sonnet 4.6 or Opus 4.7) is a stronger and costlier model than the Haiku 4.5 workers, so we don't claim to know when it pays for itself. On a short task the supervisor's tokens can outweigh a worker's, and that trade-off is still open.
 
-CRO leans on a weak-coupling assumption: an edit affects a small suffix. Edit something that touches every step (a system prompt used on every turn) and the suffix is the whole trajectory, so the reuse buys nothing. That's the cold first pass; it amortizes within a few sessions. Irreversible effects are recorded for audit, not rolled back, and nested supervision composes only under side conditions we state explicitly. The higher-order examples you can imagine, an auditor over a Deep-Research-style orchestrator, follow from the model: they're consequences, not shipped demos.
+CRO rests on a weak-coupling assumption: an edit touches a small suffix of the run. Edit something that touches every step, say a system prompt used on every turn, and the suffix is the whole trajectory, so the reuse buys you nothing. That is the cold first pass, and it amortizes over a few sessions. Irreversible effects are recorded for audit, not rolled back. Nested supervision composes only under side conditions we spell out. The higher-order cases you can picture, an auditor sitting over a Deep-Research-style orchestrator, follow from the model; they are consequences, not demos we shipped.
 
 ## Try it
 
@@ -229,7 +222,7 @@ shepherd revert 4
 *  0  0a2b8c1  run    · claude "fix the login bug"   (root)
 ```
 
-`shepherd revert 4` restores the agent and its filesystem to commit 4 byte-for-byte, dropping the regression at commit 5, so you are back to green.
+`shepherd revert 4` puts the agent and its filesystem back to commit 4, byte for byte, and drops the regression at commit 5. You are back to green.
 
 📦 [**PyPI**](https://pypi.org/project/shepherd-ai/0.0.1/)  |  💻 [**Code**](https://github.com/dcx/poc-crank-v2)
 

@@ -37,6 +37,7 @@ code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);padding:1
 .post__head{text-align:center;margin:18px 0 34px}
 .post__title{font-size:clamp(1.7rem,3.6vw,2.25rem);font-weight:700;line-height:1.18;
   letter-spacing:-.02em;margin:0 0 18px}
+.post__title-logo{display:inline-block;height:1.35em;width:auto;margin:0 .25em -.2em 0;vertical-align:baseline}
 .post__authors{font-family:var(--sans);font-size:1.05rem;line-height:1.7;
   max-width:42rem;margin:0 auto 12px}
 .post__authors a{color:var(--text)}
