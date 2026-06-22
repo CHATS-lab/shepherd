@@ -1,0 +1,131 @@
+/* blog/site/blog/blog.css - SHEPHERD blog (tmax layout, landing-page tokens) */
+:root{
+  --bg:#fff; --text:#1f2329; --muted:#5c636e; --faint:#8b929c; --line:#e6e8ec;
+  --code-bg:#f6f7f9; --link:#0d7a70; --link-h:#0a5a52; --accent:#0d7a70;
+  --sans:"Source Sans 3",system-ui,-apple-system,Segoe UI,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",monospace;
+  --col:680px; --gutter:240px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;font-family:var(--sans);color:var(--text);background:var(--bg);
+  line-height:1.7;font-size:17px;-webkit-font-smoothing:antialiased}
+a{color:var(--link);text-decoration:none}
+a:hover{color:var(--link-h);text-decoration:underline}
+sup{font-size:.68em}
+code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+
+/* nav (mirrors landing page) */
+.nav{display:flex;align-items:center;justify-content:space-between;
+  max-width:calc(var(--col) + var(--gutter));margin:0 auto;padding:14px 22px}
+.nav__brand{display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--text);letter-spacing:.02em}
+.nav__brand img{width:24px;height:24px}
+.nav__brand:hover{text-decoration:none}
+.nav__links{display:flex;gap:18px}
+.nav__links a{color:var(--muted);font-size:.95rem}
+.nav__links a:hover{color:var(--link);text-decoration:none}
+
+/* layout: centered column with a right gutter for sidenotes */
+.post{max-width:calc(var(--col) + var(--gutter));margin:0 auto;padding:8px 22px 90px}
+.post__head{max-width:var(--col);margin:14px 0 30px;text-align:center}
+.post__title{font-size:clamp(1.6rem,3.4vw,2.1rem);font-weight:700;line-height:1.2;
+  letter-spacing:-.02em;margin:0 0 16px}
+.post__authors{font-size:1.05rem;line-height:1.6;margin:0 0 4px}
+.post__authors a{color:var(--text)}
+.post__authors a:hover{color:var(--link)}
+.post__affil{color:var(--muted);font-size:.95rem;margin:0 0 2px}
+.post__equal{color:var(--faint);font-size:.85rem;margin:0 0 14px}
+.post__links{font-size:1rem;margin:0}
+.post__links .sep{color:var(--faint)}
+.post__links .off{color:var(--faint)}
+
+/* body column */
+.post-body{max-width:var(--col)}
+.post-body>*{max-width:var(--col)}
+.post-body h2,.post-body h3{letter-spacing:-.01em;line-height:1.25}
+.post-body h2{font-size:1.5rem;font-weight:700;margin:42px 0 12px}
+.post-body h3{font-size:1.18rem;font-weight:600;margin:30px 0 8px}
+.post-body p{margin:0 0 18px}
+.post-body em{font-style:italic}
+.post-body ul,.post-body ol{margin:0 0 18px;padding-left:24px}
+.post-body li{margin:6px 0}
+
+/* auto section numbering (tmax) */
+.post-body{counter-reset:h2}
+.post-body h2{counter-reset:h3}
+.post-body h2::before{counter-increment:h2;content:counter(h2) ". ";color:var(--accent)}
+.post-body h3::before{counter-increment:h3;content:counter(h2) "." counter(h3) "  ";color:var(--accent)}
+.post-body h2.nonum::before,.post-body h3.nonum::before{content:"";counter-increment:none}
+
+/* table of contents */
+.toc{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;
+  padding:14px 20px;margin:0 0 30px;font-size:.96rem;max-width:var(--col)}
+.toc::before{content:"Contents";display:block;font-weight:700;margin-bottom:6px}
+.toc ul{margin:0;padding-left:18px}
+.toc>ul{padding-left:0;list-style:none}
+.toc li{margin:3px 0}
+.toc a{color:var(--text)}
+.toc a:hover{color:var(--link)}
+
+/* figures */
+figure{margin:26px 0;max-width:var(--col)}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:6px}
+figcaption{font-size:.86rem;color:var(--muted);margin-top:8px;line-height:1.5}
+
+/* tables */
+table{border-collapse:collapse;width:100%;max-width:var(--col);margin:22px 0;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+thead th{border-bottom:2px solid #d4d8de;font-weight:700}
+tbody tr:hover{background:#fafbfc}
+
+/* callouts */
+.callout{border-radius:10px;padding:16px 20px;margin:24px 0;max-width:var(--col)}
+.callout>:first-child{margin-top:0}.callout>:last-child{margin-bottom:0}
+.callout--tldr{background:var(--code-bg);border:1px solid var(--line)}
+.callout--tldr::before{content:"\1F4CC  TL;DR";display:block;font-weight:700;margin-bottom:8px}
+.callout--insight{background:#eaf3ff;border:1px solid #cfe0f5}
+.callout--insight::before{content:"\1F4A1";display:block;font-size:1.1rem;margin-bottom:2px}
+
+/* code */
+pre{background:var(--code-bg);border:1px solid var(--line);border-radius:8px;
+  padding:14px 16px;overflow-x:auto;margin:20px 0;max-width:var(--col)}
+pre code{background:none;padding:0;font-size:.82rem;line-height:1.7;white-space:pre}
+.hl .k,.hl .kn,.hl .kd,.hl .kc{color:#8a4fd0}            /* keyword */
+.hl .s,.hl .s1,.hl .s2,.hl .sb,.hl .sd{color:#3a7d3a}    /* string  */
+.hl .c,.hl .c1,.hl .cm{color:#8b929c;font-style:italic}  /* comment */
+.hl .nf,.hl .nd{color:#0d7a70;font-weight:600}           /* func / decorator */
+.hl .nb{color:#b06a1c}
+.hl .mi,.hl .mf{color:#b06a1c}                            /* numbers */
+
+/* details (FAQ, formal footing) */
+details{border-top:1px solid var(--line);padding-top:12px;margin:10px 0 0;max-width:var(--col)}
+summary{cursor:pointer;font-weight:600;color:var(--accent)}
+details>:not(summary){font-size:.97rem;color:#3a4350;margin-top:10px}
+
+/* sidenotes (Tufte margin notes) */
+.sn{position:relative}
+.sn-ref{cursor:pointer;color:var(--accent);font-weight:700;font-size:.7em;
+  vertical-align:super;line-height:0;padding:0 1px}
+.sn-toggle{display:none}
+.sn-num{color:var(--accent);font-weight:700;margin-right:3px}
+.sn-body{font-size:.82rem;line-height:1.5;color:var(--muted)}
+@media (min-width:1081px){
+  .sn-body{float:right;clear:right;width:var(--gutter);
+    margin-right:calc(-1 * var(--gutter) - 16px);margin-bottom:14px;text-align:left}
+  .sn-ref{pointer-events:none}
+}
+@media (max-width:1080px){
+  .sn-body{display:none;margin:10px 0;padding:10px 12px;background:var(--code-bg);
+    border-left:3px solid var(--accent);border-radius:0 6px 6px 0}
+  .sn-toggle:checked ~ .sn-body{display:block}
+}
+
+/* footer */
+.post__foot{margin-top:60px;padding-top:18px;border-top:1px solid var(--line);
+  color:var(--faint);font-size:.9rem;max-width:var(--col)}
+
+@media (max-width:760px){
+  .post-body h2{font-size:1.32rem}
+  body{font-size:16px}
+}

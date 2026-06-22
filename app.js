@@ -1,6 +1,7 @@
-/* SHEPHERD landing — animated "execution becomes data" diagram.
-   Reveals the left trace (create -> observe -> intercept -> recover) and the
-   right code blocks one-by-one in the same order. Vanilla JS. */
+/* SHEPHERD landing — "execution becomes data" diagram with a scrubber.
+   Plays the trace once (create -> observe -> edit -> intercept -> revert -> fork)
+   and rests on the final frame. A reader can slide the line to stop at any step,
+   or hit Replay (bottom right) to run it again. Vanilla JS. */
 (function () {
   "use strict";
 
@@ -19,40 +20,104 @@
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const SEQ = ["create", "observe", "buggy", "intercept", "revert", "fork"];
-  const DELAY = { create: 250, observe: 1100, buggy: 1950, intercept: 2800, revert: 3650, fork: 4500 };
-  let timers = [];
+  const LAST = SEQ.length - 1;
+  const STEP_MS = 1150; // dwell per step while playing
 
-  function reset() {
-    timers.forEach(clearTimeout);
-    timers = [];
-    anim.querySelectorAll(".g-step, .cblock, .cimport").forEach((e) => e.classList.remove("in"));
-  }
-  function reveal(step) {
-    anim.querySelectorAll('[data-step="' + step + '"]').forEach((e) => e.classList.add("in"));
-    if (step === "create") {
-      const imp = anim.querySelector(".cimport");
-      if (imp) imp.classList.add("in");
-    }
-  }
-  function run() {
-    reset();
-    if (reduce) { SEQ.forEach(reveal); return; }
-    SEQ.forEach((s) => timers.push(setTimeout(() => reveal(s), DELAY[s])));
-    timers.push(setTimeout(run, DELAY.fork + 2800)); // hold, then replay periodically
+  const track  = anim.querySelector(".scrub__track");
+  const fill   = anim.querySelector(".scrub__fill");
+  const handle = anim.querySelector(".scrub__handle");
+  const replay = anim.querySelector(".anim__replay");
+  const stops  = Array.prototype.slice.call(anim.querySelectorAll(".scrub__stop"));
+
+  let cur = LAST;   // current step index; rests on the full picture by default
+  let timer = null;
+
+  function clearTimer() { if (timer) { clearTimeout(timer); timer = null; } }
+
+  function applyReveal(i) {
+    SEQ.forEach((step, idx) => {
+      const on = idx <= i;
+      anim.querySelectorAll('[data-step="' + step + '"]').forEach((el) => el.classList.toggle("in", on));
+    });
+    const imp = anim.querySelector(".cimport");
+    if (imp) imp.classList.toggle("in", i >= 0);
   }
 
-  const btn = anim.querySelector(".anim__replay");
-  if (btn) btn.addEventListener("click", run);
+  function paint(i) {
+    const pct = i < 0 ? 0 : (i / LAST) * 100;
+    if (fill) fill.style.width = pct + "%";
+    if (handle) handle.style.left = pct + "%";
+    stops.forEach((s, idx) => {
+      s.classList.toggle("done", idx <= i);
+      s.classList.toggle("active", idx === i);
+    });
+    if (track) track.setAttribute("aria-valuenow", Math.max(0, i));
+  }
 
-  if (reduce || !("IntersectionObserver" in window)) {
-    run();
+  function setStep(i) {
+    cur = Math.max(0, Math.min(LAST, i));
+    applyReveal(cur);
+    paint(cur);
+  }
+
+  // play once from the start, then stop on the final frame
+  function play() {
+    clearTimer();
+    if (reduce) { setStep(LAST); return; }
+    setStep(0);
+    timer = setTimeout(function tick() {
+      if (cur >= LAST) { clearTimer(); return; }
+      setStep(cur + 1);
+      if (cur < LAST) timer = setTimeout(tick, STEP_MS);
+    }, STEP_MS);
+  }
+
+  if (replay) replay.addEventListener("click", play);
+
+  // --- scrubber: drag / click / keyboard jumps to a step and stops playback ---
+  function indexFromEvent(e) {
+    const r = track.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width;
+    return Math.max(0, Math.min(LAST, Math.round(x * LAST)));
+  }
+
+  let dragging = false;
+  if (track) {
+    track.addEventListener("pointerdown", (e) => {
+      dragging = true;
+      track.classList.add("dragging");
+      if (track.setPointerCapture) track.setPointerCapture(e.pointerId);
+      clearTimer();
+      setStep(indexFromEvent(e));
+      e.preventDefault();
+    });
+    track.addEventListener("pointermove", (e) => { if (dragging) setStep(indexFromEvent(e)); });
+    const endDrag = () => { dragging = false; track.classList.remove("dragging"); };
+    track.addEventListener("pointerup", endDrag);
+    track.addEventListener("pointercancel", endDrag);
+    track.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft" || e.key === "ArrowDown") { clearTimer(); setStep(cur - 1); e.preventDefault(); }
+      else if (e.key === "ArrowRight" || e.key === "ArrowUp") { clearTimer(); setStep(cur + 1); e.preventDefault(); }
+      else if (e.key === "Home") { clearTimer(); setStep(0); e.preventDefault(); }
+      else if (e.key === "End") { clearTimer(); setStep(LAST); e.preventDefault(); }
+    });
+  }
+
+  // --- initial: play once when scrolled into view, then rest on the last frame ---
+  if (reduce) {
+    setStep(LAST);
   } else {
-    let played = false;
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting && !played) { played = true; run(); io.disconnect(); }
-      });
-    }, { threshold: 0.35 });
-    io.observe(anim);
+    applyReveal(-1); paint(-1); // start blank so the first reveal reads as an animation
+    if (!("IntersectionObserver" in window)) {
+      play();
+    } else {
+      let started = false;
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting && !started) { started = true; play(); io.disconnect(); }
+        });
+      }, { threshold: 0.35 });
+      io.observe(anim);
+    }
   }
 })();

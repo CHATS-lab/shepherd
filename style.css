@@ -142,12 +142,49 @@ details p { margin-top: 10px; font-size: .95rem; color: var(--muted); }
 
 .anim__replay {
   grid-column: 1 / -1; justify-self: end;
+  display: inline-flex; align-items: center; gap: 6px;
   font-family: var(--mono); font-size: .76rem;
   padding: 6px 13px; border-radius: 999px;
   border: 1px solid var(--line); background: var(--code-bg); color: var(--muted);
   cursor: pointer;
 }
 .anim__replay:hover { color: var(--accent); border-color: var(--accent); }
+.anim__replay svg { display: block; }
+
+/* ===== scrubber: slide to any step in the trace ===== */
+/* --scrub is a deliberately distinct blue, separate from the teal/violet in the diagram */
+.anim__scrub { grid-column: 1 / -1; padding: 0 12px; --scrub: #2f6bd6; }
+.scrub__track {
+  position: relative; height: 3px; background: var(--line);
+  margin: 18px 12px 40px; cursor: pointer; outline: none; touch-action: none;
+}
+.scrub__track:focus-visible { box-shadow: 0 0 0 3px rgba(47,107,214,.20); border-radius: 2px; }
+.scrub__fill {
+  position: absolute; left: 0; top: 0; height: 100%; width: 100%;
+  background: var(--scrub); transition: width .3s ease;
+}
+.scrub__handle {
+  position: absolute; top: 50%; left: 100%; width: 20px; height: 20px; border-radius: 50%;
+  background: #fff; border: 3px solid var(--scrub); transform: translate(-50%, -50%);
+  transition: left .3s ease; pointer-events: none; z-index: 2;
+}
+.scrub__track.dragging .scrub__fill,
+.scrub__track.dragging .scrub__handle { transition: none; }
+.scrub__stop {
+  position: absolute; top: 50%; transform: translate(-50%, -50%);
+  width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+}
+.scrub__stop::before {
+  content: ""; width: 15px; height: 15px; border-radius: 50%;
+  background: #fff; border: 2.5px solid #c1c7d0; box-sizing: border-box;
+}
+.scrub__stop.done::before { border-color: var(--scrub); background: var(--scrub); }
+.scrub__lbl {
+  position: absolute; top: 22px; left: 50%; transform: translateX(-50%);
+  font-family: var(--mono); font-size: .85rem; white-space: nowrap; color: var(--muted);
+}
+.scrub__stop.active .scrub__lbl { color: var(--scrub); font-weight: 600; }
+@media (max-width: 560px) { .scrub__lbl { font-size: .68rem; } }
 
 /* reveal states */
 .g-step { opacity: 0; transition: opacity .55s ease; }
