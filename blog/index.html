@@ -21,10 +21,15 @@
   </div>
 </nav>
 <div class="layout">
-  <nav id="TOC" role="doc-toc">
-    <label class="toc-label" for="toc-toggle">Contents</label>
-    <input type="checkbox" id="toc-toggle" class="toc-toggle">
-    <div class="toc">
+  <nav id="TOC" role="doc-toc" aria-label="Table of contents">
+    <button class="toc-fab" type="button" aria-controls="toc-panel" aria-expanded="false">
+      <svg class="toc-fab__icon" width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 3.5h13M1.5 8h13M1.5 12.5h8.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      Contents
+    </button>
+    <div class="toc-backdrop"></div>
+    <aside class="toc-panel" id="toc-panel">
+      <p class="toc-label">Contents</p>
+      <div class="toc">
 <ul>
 <li><a href="#motivation">Motivation</a></li>
 <li><a href="#the-idea-agents-all-the-way-up">The idea: agents all the way up</a></li>
@@ -43,6 +48,7 @@
 </ul>
 </div>
 
+    </aside>
   </nav>
   <main class="post">
     <header class="post__head">

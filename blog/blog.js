@@ -5,6 +5,22 @@
   var toc = document.getElementById("TOC");
   if (!toc) return;
 
+  // mobile slide-up sheet: button toggles it; link / backdrop / Esc close it
+  var fab = toc.querySelector(".toc-fab");
+  var backdrop = toc.querySelector(".toc-backdrop");
+  function setOpen(open) {
+    toc.classList.toggle("open", open);
+    if (fab) fab.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  if (fab) fab.addEventListener("click", function () { setOpen(!toc.classList.contains("open")); });
+  if (backdrop) backdrop.addEventListener("click", function () { setOpen(false); });
+  toc.querySelectorAll(".toc-panel a").forEach(function (a) {
+    a.addEventListener("click", function () { setOpen(false); });
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") setOpen(false);
+  });
+
   var links = {};
   toc.querySelectorAll('a[href^="#"]').forEach(function (a) {
     links[decodeURIComponent(a.getAttribute("href").slice(1))] = a;
