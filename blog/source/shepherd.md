@@ -28,7 +28,7 @@ links:
 >
 > We build three meta-agents on it. A live supervisor closes 91% of the coordination gap on CooperBench, lifting pair pass rate from 28.8% to 54.7%. A counterfactual optimizer beats GEPA and MetaHarness on 4 of 5 benchmarks, and does it in less wall-clock every time. Meta-agent-guided Tree-GRPO adds 5.2 points over flat GRPO on Qwen3.5-35B-A3B (and 3.4 on the larger Nemotron-3-Super-120B-A12B). Underneath, a fork that carries its whole filesystem costs 134 to 143 ms, about 5x cheaper than `docker commit`, and the core correctness argument is checked in Lean.
 
-![**Figure 1.** SHEPHERD makes an agent's whole execution a Git-like, reversible trace. A meta-agent observes, intercepts, forks, and reverts a worker (top left); the same `@agent` code expresses it (right); and three meta-agents built on the substrate improve runtime supervision, counterfactual optimization, and tree-RL (bottom).](../assets/fig-teaser.png)
+![**Figure 1.** Three meta-agents over one substrate. (a) A supervisor observes two worker agents and steps in to resolve a conflict before it lands. (b) A counterfactual optimizer forks a finished run at the first changed step, fixes it, and replays against a fixed baseline. (c) A training meta-agent forks K sibling rollouts mid-trajectory to read off per-step advantage for tree-search RL.](../assets/fig-teaser.png)
 
 ## Motivation
 
