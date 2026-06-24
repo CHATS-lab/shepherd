@@ -14,7 +14,7 @@ affiliations:
   - { id: 1, name: "Northeastern University" }
   - { id: 2, name: "Stanford University" }
 links:
-  - { label: "Homepage", url: "https://chats-lab.github.io/shepherd/" }
+  - { label: "Homepage", url: "https://shepherd-agents.ai/" }
   - { label: "Paper",    url: "https://arxiv.org/abs/2605.10913" }
   - { label: "alphaXiv", url: "https://www.alphaxiv.org/abs/2605.10913" }
   - { label: "Code",     url: "https://github.com/dcx/poc-crank-v2" }
