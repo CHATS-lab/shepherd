@@ -142,7 +142,8 @@ tbody tr:hover{background:#fafbfc}
 .callout--tldr{background:var(--code-bg);border:1px solid var(--line)}
 .callout--tldr::before{content:"\1F4CC  TL;DR";display:block;font-weight:700;margin-bottom:8px}
 .callout--insight{background:#eaf3ff;border:1px solid #cfe0f5}
-.callout__label{font-weight:700;font-size:1.02rem;margin:0 0 8px}
+.callout__label{font-weight:700;font-size:1.02rem;margin:0 0 8px;color:var(--accent)}
+.callout__logo{height:1.05em;width:auto;vertical-align:-.2em;margin-left:.15em}
 
 /* ---- code ---- */
 pre{background:var(--code-bg);border:1px solid var(--line);border-radius:8px;

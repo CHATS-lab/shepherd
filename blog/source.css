@@ -35,7 +35,8 @@ body{margin:0;background:#fff;font-family:var(--sans)}
 .markdown-body .callout>:last-child{margin-bottom:0}
 .markdown-body .callout--insight{background:#ddf4ff;border-color:#b6e3ff}
 .markdown-body .callout--tldr::before{content:"\1F4CC  TL;DR";font-weight:700;display:block;margin-bottom:6px}
-.markdown-body .callout__label{font-weight:700;margin:0 0 6px}
+.markdown-body .callout__label{font-weight:700;margin:0 0 6px;color:#0d7a70}
+.markdown-body .callout__logo{height:1.05em;width:auto;vertical-align:-.2em;margin-left:.15em}
 
 /* inline brand marks (logo sized down; blog.css isn't loaded here) */
 .markdown-body .brand{font-weight:700;white-space:nowrap;color:#0d7a70}
