@@ -74,7 +74,7 @@ Each construct maps onto a familiar building block: task = typed function, effec
 
 **A fork has to be almost free**, because the meta-agents below fork on every supervision step and every RL rollout. :shepherd: adds a copy-on-write layer instead of copying the filesystem, so a fork stays fast no matter how big the image gets:
 
-| Method | Fork, 42 MB | Fork, 200 MB | Fork, 5.8 GB | Storage / fork |
+| Method | Fork 42 MB | Fork 200 MB | Fork 5.8 GB | Storage / fork |
 |---|---|---|---|---|
 | Full root-fs copy | 5,154 ms | 5,971 ms | 53,462 ms | up to 8.3 GB |
 | docker commit | 658 ms | 692 ms | 725 ms | ~30 KB |
