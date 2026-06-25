@@ -100,7 +100,7 @@ Each construct maps onto a familiar building block: task = typed function, effec
 <td>~12 KB</td>
 </tr>
 <tr>
-<td><strong>SHEPHERD</strong></td>
+<td><span class="brand"><img class="brand__logo" src="../../assets/logo-shepherd.png" alt="">Shepherd</span></td>
 <td><strong>134 ms</strong></td>
 <td><strong>135 ms</strong></td>
 <td><strong>143 ms</strong></td>
@@ -170,7 +170,7 @@ Each construct maps onto a familiar building block: task = typed function, effec
 <td>31.2 (173)</td>
 </tr>
 <tr>
-<td><strong>CRO</strong></td>
+<td><span class="brand"><img class="brand__logo" src="../../assets/logo-shepherd.png" alt="">CRO</span></td>
 <td><strong>79.4±0.2</strong> (120)</td>
 <td><strong>80.0±2.0</strong> (42)</td>
 <td>51.3±1.1 (82)</td>
@@ -204,7 +204,7 @@ Each construct maps onto a familiar building block: task = typed function, effec
 <th>Model</th>
 <th>Base</th>
 <th>Flat GRPO</th>
-<th>Tree-GRPO</th>
+<th><span class="brand"><img class="brand__logo" src="../../assets/logo-shepherd.png" alt="">Tree-GRPO</span></th>
 </tr>
 </thead>
 <tbody>
@@ -277,9 +277,6 @@ Can you put a supervisor over your orchestrator by *writing an agent*, instead o
 
 </details>
 
-<h2 id="limitations-and-honest-scope">Limitations and honest scope</h2>
-<p><strong>Supervision is a proof of existence, not a sweep.</strong> The meta-agent (Sonnet 4.6 or Opus 4.7) is a stronger and costlier model than the Haiku 4.5 workers, so we don't claim to know when it pays for itself. On a short task the supervisor's tokens can outweigh a worker's, and that trade-off is still open.</p>
-<p><strong>CRO rests on weak coupling.</strong> It assumes an edit touches a small suffix of the run. Edit something that touches every step (a system prompt used on every turn) and the suffix is the whole trajectory, so the reuse buys nothing. That is the cold first pass, and it amortizes over a few sessions. Irreversible effects are recorded for audit, not rolled back. Nested supervision composes only under side conditions we spell out, and the higher-order cases you can picture (an auditor over a Deep-Research-style orchestrator) follow from the model; they are consequences, not demos we shipped.</p>
 <h2 id="try-it">Try it</h2>
 <div class="hl"><pre><span></span><code><span class="c1"># 1 · install</span>
 pip<span class="w"> </span>install<span class="w"> </span>shepherd-ai

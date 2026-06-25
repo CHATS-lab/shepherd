@@ -42,7 +42,6 @@
 </ul>
 </li>
 <li><a href="#faq">FAQ</a></li>
-<li><a href="#limitations-and-honest-scope">Limitations and honest scope</a></li>
 <li><a href="#try-it">Try it</a></li>
 <li><a href="#acknowledgments">Acknowledgments</a></li>
 </ul>
@@ -52,7 +51,7 @@
   </nav>
   <main class="post">
     <header class="post__head">
-      <h1 class="post__title"><img class="post__title-logo" src="../assets/logo-shepherd.png" alt="">Shepherd: A Runtime Substrate Empowering Meta-Agents with a Formalized Execution Trace</h1>
+      <h1 class="post__title"><img class="post__title-logo" src="../assets/logo-shepherd.png" alt=""><span class="brand-name">Shepherd</span>: A Runtime Substrate Empowering Meta-Agents with a Formalized Execution Trace</h1>
       <p class="post__authors">
 <a href="https://simonucl.github.io/">Simon Yu</a><span class="sn sn--byline"><input type="checkbox" id="sn-byline" class="sn-toggle"><label for="sn-byline" class="sn-ref">*</label><span class="sn-body">* denotes equal contribution.</span></span><sup>1</sup>, <a href="https://nlp.stanford.edu/~derekch/">Derek Chong</a><sup>*</sup><sup>2</sup>, <a href="https://ananjan-nandi-9.github.io/">Ananjan Nandi</a><sup>*</sup><sup>2</sup>, <a href="https://profiles.stanford.edu/dilara">Dilara Soylu</a><sup>2</sup>, <a href="https://jiudingsun01.github.io/">Jiuding Sun</a><sup>2</sup>,<br><a href="https://nlp.stanford.edu/~manning/">Christopher D. Manning</a><sup>2</sup>, <a href="https://wyshi.github.io/">Weiyan Shi</a><sup>1</sup>      </p>
       <p class="post__affil"><span class="affil-pill"><sup>1</sup>Northeastern University &middot; <sup>2</sup>Stanford University</span></p>
@@ -136,7 +135,7 @@ Each construct maps onto a familiar building block: task = typed function, effec
 <td>~12 KB</td>
 </tr>
 <tr>
-<td><strong>SHEPHERD</strong></td>
+<td><span class="brand"><img class="brand__logo" src="../assets/logo-shepherd.png" alt="">Shepherd</span></td>
 <td><strong>134 ms</strong></td>
 <td><strong>135 ms</strong></td>
 <td><strong>143 ms</strong></td>
@@ -206,7 +205,7 @@ Each construct maps onto a familiar building block: task = typed function, effec
 <td>31.2 (173)</td>
 </tr>
 <tr>
-<td><strong>CRO</strong></td>
+<td><span class="brand"><img class="brand__logo" src="../assets/logo-shepherd.png" alt="">CRO</span></td>
 <td><strong>79.4±0.2</strong> (120)</td>
 <td><strong>80.0±2.0</strong> (42)</td>
 <td>51.3±1.1 (82)</td>
@@ -240,7 +239,7 @@ Each construct maps onto a familiar building block: task = typed function, effec
 <th>Model</th>
 <th>Base</th>
 <th>Flat GRPO</th>
-<th>Tree-GRPO</th>
+<th><span class="brand"><img class="brand__logo" src="../assets/logo-shepherd.png" alt="">Tree-GRPO</span></th>
 </tr>
 </thead>
 <tbody>
@@ -313,9 +312,6 @@ Can you put a supervisor over your orchestrator by *writing an agent*, instead o
 
 </details>
 
-<h2 id="limitations-and-honest-scope">Limitations and honest scope</h2>
-<p><strong>Supervision is a proof of existence, not a sweep.</strong> The meta-agent (Sonnet 4.6 or Opus 4.7) is a stronger and costlier model than the Haiku 4.5 workers, so we don't claim to know when it pays for itself. On a short task the supervisor's tokens can outweigh a worker's, and that trade-off is still open.</p>
-<p><strong>CRO rests on weak coupling.</strong> It assumes an edit touches a small suffix of the run. Edit something that touches every step (a system prompt used on every turn) and the suffix is the whole trajectory, so the reuse buys nothing. That is the cold first pass, and it amortizes over a few sessions. Irreversible effects are recorded for audit, not rolled back. Nested supervision composes only under side conditions we spell out, and the higher-order cases you can picture (an auditor over a Deep-Research-style orchestrator) follow from the model; they are consequences, not demos we shipped.</p>
 <h2 id="try-it">Try it</h2>
 <div class="hl"><pre><span></span><code><span class="c1"># 1 · install</span>
 pip<span class="w"> </span>install<span class="w"> </span>shepherd-ai

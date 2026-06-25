@@ -102,9 +102,10 @@ code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);padding:1
 .ab-note a{font-weight:600}
 
 /* ---- inline brands (:shepherd: meta-agent, :worker:/:agent: base agent) ---- */
-.brand{font-weight:700;white-space:nowrap}
-.brand--worker{color:#5a3fa3}
+.brand{font-weight:700;white-space:nowrap;color:var(--accent)}   /* Shepherd green */
+.brand--worker{color:#5a3fa3}                                    /* base agent violet */
 .brand__logo{height:1.05em;width:auto;vertical-align:-.2em;margin-right:.12em}
+.post__title .brand-name{color:var(--accent)}                    /* green "Shepherd" in title */
 
 /* ---- body ---- */
 .post-body{max-width:var(--col)}

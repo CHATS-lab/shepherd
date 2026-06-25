@@ -79,7 +79,7 @@ Each construct maps onto a familiar building block: task = typed function, effec
 | Full root-fs copy | 5,154 ms | 5,971 ms | 53,462 ms | up to 8.3 GB |
 | docker commit | 658 ms | 692 ms | 725 ms | ~30 KB |
 | BranchFS | 266 ms | 272 ms | 280 ms | ~12 KB |
-| **SHEPHERD** | **134 ms** | **135 ms** | **143 ms** | **~10 KB** |
+| :smark: | **134 ms** | **135 ms** | **143 ms** | **~10 KB** |
 
 *Fork latency by image size; revert is similar, 140 to 147 ms. The cost barely moves as the image grows: about 5x faster than `docker commit`, and up to 192x faster than a full copy on the 5.8 GB image, which is 2 to 3% of a single agent turn. A fork also keeps the byte-identical prefix, so replaying a branch reuses the provider's KV cache, with the hit rate settling around 95% from K=2 on.*
 
@@ -115,7 +115,7 @@ Three meta-agents on one :shepherd: substrate, at three moments in an agent's li
 | Baseline | 43.7±0.0 | 60.7±1.2 | 42.4±1.8 | 30.7±2.1 | 31.2 |
 | GEPA | 43.7±0.0 (67) | 74.0±3.5 (20) | 50.1±1.2 (50) | 48.7±1.5 (73) | 31.2 (157) |
 | MetaHarness | 77.8±0.4 (235) | 79.3±1.2 (101) | **52.3±1.4** (126) | 40.0±3.6 (217) | 31.2 (173) |
-| **CRO** | **79.4±0.2** (120) | **80.0±2.0** (42) | 51.3±1.1 (82) | **51.0±1.7** (117) | **35.2** (73) |
+| :cro: | **79.4±0.2** (120) | **80.0±2.0** (42) | 51.3±1.1 (82) | **51.0±1.7** (117) | **35.2** (73) |
 
 *Test pass-rate mean ± std; optimization minutes in parentheses; bold = best per row. CRO's wall-clock lead over MetaHarness reaches ~58% on MATH (42 vs 101 min). On execution-heavy TB-2, neither GEPA nor MetaHarness beats the 31.2 baseline, while CRO reaches 35.2 (+4 points) at the least wall-clock. The one near-tie is IFBench: MetaHarness edges CRO inside a std (52.3 vs 51.3), and CRO still does it in less time, 82 vs 126 minutes.*
 
@@ -134,7 +134,7 @@ Three meta-agents on one :shepherd: substrate, at three moments in an agent's li
 
 **The transfer result.** Out-of-distribution transfer to TerminalBench 2.0 (avg@5, 89 tasks, 5 seeds), a suite never seen in training:
 
-| Model | Base | Flat GRPO | Tree-GRPO |
+| Model | Base | Flat GRPO | :treegrpo: |
 |---|---|---|---|
 | Qwen3.5-35B-A3B | 26.1±4.21 | 34.2±4.05 | **39.4±3.87** (+5.2) |
 | Nemotron-3-Super-120B-A12B | 30.3±3.62 | 33.8±3.41 | **37.2±3.19** (+3.4) |
@@ -193,12 +193,6 @@ The right objection. But the kernel is mechanism, not policy: it intercepts, per
 Can you put a supervisor over your orchestrator by *writing an agent*, instead of forking the framework? If not, your harness isn't an agent. It just contains one.
 
 </details>
-
-## Limitations and honest scope
-
-**Supervision is a proof of existence, not a sweep.** The meta-agent (Sonnet 4.6 or Opus 4.7) is a stronger and costlier model than the Haiku 4.5 workers, so we don't claim to know when it pays for itself. On a short task the supervisor's tokens can outweigh a worker's, and that trade-off is still open.
-
-**CRO rests on weak coupling.** It assumes an edit touches a small suffix of the run. Edit something that touches every step (a system prompt used on every turn) and the suffix is the whole trajectory, so the reuse buys nothing. That is the cold first pass, and it amortizes over a few sessions. Irreversible effects are recorded for audit, not rolled back. Nested supervision composes only under side conditions we spell out, and the higher-order cases you can picture (an auditor over a Deep-Research-style orchestrator) follow from the model; they are consequences, not demos we shipped.
 
 ## Try it
 
