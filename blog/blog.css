@@ -142,7 +142,7 @@ tbody tr:hover{background:#fafbfc}
 .callout--tldr{background:var(--code-bg);border:1px solid var(--line)}
 .callout--tldr::before{content:"\1F4CC  TL;DR";display:block;font-weight:700;margin-bottom:8px}
 .callout--insight{background:#eaf3ff;border:1px solid #cfe0f5}
-.callout--insight::before{content:"\1F4A1";display:block;font-size:1.1rem;margin-bottom:2px}
+.callout__label{font-weight:700;font-size:1.02rem;margin:0 0 8px}
 
 /* ---- code ---- */
 pre{background:var(--code-bg);border:1px solid var(--line);border-radius:8px;

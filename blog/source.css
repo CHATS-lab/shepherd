@@ -35,7 +35,12 @@ body{margin:0;background:#fff;font-family:var(--sans)}
 .markdown-body .callout>:last-child{margin-bottom:0}
 .markdown-body .callout--insight{background:#ddf4ff;border-color:#b6e3ff}
 .markdown-body .callout--tldr::before{content:"\1F4CC  TL;DR";font-weight:700;display:block;margin-bottom:6px}
-.markdown-body .callout--insight::before{content:"\1F4A1";display:block;margin-bottom:2px}
+.markdown-body .callout__label{font-weight:700;margin:0 0 6px}
+
+/* inline brand marks (logo sized down; blog.css isn't loaded here) */
+.markdown-body .brand{font-weight:700;white-space:nowrap;color:#0d7a70}
+.markdown-body .brand--worker{color:#5a3fa3}
+.markdown-body .brand__logo{height:1.05em;width:auto;vertical-align:-.2em;margin-right:.12em}
 
 /* sidenotes -> inline parenthetical asides (no margins in a README layout) */
 .markdown-body .sn-toggle,.markdown-body .sn-ref{display:none}
