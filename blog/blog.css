@@ -96,45 +96,46 @@ code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);padding:1
   #TOC.open .toc-panel{transform:translateY(0)}
 }
 
-/* ---- A/B test note (temporary) ---- */
-.ab-note{max-width:var(--layout);margin:0 auto;padding:8px 22px;font-size:.82rem;
-  color:var(--muted);text-align:center;background:#fff7e6;border-bottom:1px solid #f0e3c4}
-.ab-note a{font-weight:600}
 
 /* ---- inline brands (:shepherd: meta-agent, :worker:/:agent: base agent) ---- */
 .brand{font-weight:700;white-space:nowrap;color:var(--accent)}   /* Shepherd green */
 .brand--worker{color:#5a3fa3}                                    /* base agent violet */
 .brand__logo{height:1.05em;width:auto;vertical-align:-.2em;margin-right:.12em}
 .post__title .brand-name{color:var(--accent)}                    /* green "Shepherd" in title */
+/* resource-link icons in the TL;DR resources line */
+.rsrc{height:1em;width:auto;vertical-align:-.16em;margin-right:.28em;opacity:.9}
 
 /* ---- body ---- */
 .post-body{max-width:var(--col)}
 .post-body>*{max-width:var(--col)}
-.post-body h2,.post-body h3{letter-spacing:-.01em;line-height:1.25}
-.post-body h2{font-size:1.5rem;font-weight:700;margin:42px 0 12px}
-.post-body h3{font-size:1.18rem;font-weight:600;margin:30px 0 8px}
+.post-body h1,.post-body h4{letter-spacing:-.01em;line-height:1.25}
+.post-body h1{font-size:1.5rem;font-weight:700;margin:42px 0 12px}
+.post-body h4{font-size:1.18rem;font-weight:600;margin:30px 0 8px}
 .post-body p{margin:0 0 18px}
 .post-body em{font-style:italic}
 .post-body ul,.post-body ol{margin:0 0 18px;padding-left:24px}
 .post-body li{margin:6px 0}
 
 /* auto section numbering */
-.post-body{counter-reset:h2}
-.post-body h2{counter-reset:h3}
-.post-body h2::before{counter-increment:h2;content:counter(h2) ". ";color:var(--accent)}
-.post-body h3::before{counter-increment:h3;content:counter(h2) "." counter(h3) "  ";color:var(--accent)}
-.post-body h2.nonum::before,.post-body h3.nonum::before{content:"";counter-increment:none}
+.post-body{counter-reset:sec}
+.post-body h1{counter-reset:sub}
+.post-body h1::before{counter-increment:sec;content:counter(sec) ". ";color:var(--accent)}
+.post-body h4::before{counter-increment:sub;content:counter(sec) "." counter(sub) "  ";color:var(--accent)}
+.post-body h1.nonum::before,.post-body h4.nonum::before{content:"";counter-increment:none}
 
 /* ---- figures ---- */
 figure{margin:26px 0;max-width:var(--col)}
-figure img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:6px}
+figure img{display:block;width:100%;height:auto}
 figcaption{font-size:.86rem;color:var(--muted);margin-top:8px;line-height:1.5}
 
-/* ---- tables ---- */
+/* ---- tables (tinted header + zebra rows + highlighted Shepherd row) ---- */
 table{border-collapse:collapse;width:100%;max-width:var(--col);margin:22px 0;font-size:.92rem}
 th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
-thead th{border-bottom:2px solid #d4d8de;font-weight:700}
-tbody tr:hover{background:#fafbfc}
+thead th{background:#e9f4f2;color:#0a4a44;border-bottom:2px solid var(--accent);font-weight:700}
+tbody tr:nth-child(even){background:#f7faf9}
+tbody tr:hover{background:#eef6f4}
+tbody tr:has(.brand:not(.brand--worker)){background:#e6f6ee}            /* our-method row (Shepherd/CRO/Tree-GRPO) */
+tbody tr:has(.brand:not(.brand--worker)):hover{background:#dcf2e6}
 
 /* ---- callouts ---- */
 .callout{border-radius:10px;padding:16px 20px;margin:24px 0;max-width:var(--col)}
@@ -185,7 +186,7 @@ details>:not(summary){font-size:.97rem;color:#3a4350;margin-top:10px}
   color:var(--faint);font-size:.9rem;max-width:var(--col)}
 
 @media (max-width:760px){
-  .post-body h2{font-size:1.32rem}
+  .post-body h1{font-size:1.32rem}
   body{font-size:16px}
 }
 
